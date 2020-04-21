@@ -1,0 +1,457 @@
+package Classes;
+
+import Controleurs.ModificationClientContribuableController;
+import Controleurs.PayementController;
+import static Controleurs.PayementController.usd1;
+import Controleurs.PrincipaleController;
+import Controleurs.UtilisateursController;
+import static Controleurs.UtilisateursController.ssexM;
+import static Controleurs.UtilisateursController.ssexeF;
+import DAO.MysSqlConnection;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXRadioButton;
+import com.jfoenix.controls.JFXTextField;
+import com.mysql.jdbc.PreparedStatement;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.Duration;
+import javax.imageio.ImageIO;
+import org.controlsfx.control.Notifications;
+import org.controlsfx.control.textfield.TextFields;
+
+public class ContenuClasse {
+    //chargement du stakpane tapi 
+
+    public void _ChageStakpane(StackPane stakpane, String fichierFXML) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource(fichierFXML));
+        stakpane.getChildren().removeAll();
+        stakpane.getChildren().setAll(root);
+    }
+//changement de fichier fxml(formulaire)  chnagement de fenetre par une autre logine ----> principale
+
+    public void _ChangerFXML(String fichierFXML, String title) throws IOException {
+        Stage stg = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource(fichierFXML));
+        stg.setTitle(title);
+        stg.setScene(new Scene(root));
+        stg.show();
+    }
+    
+    public void _Logine(String fichierFXML, String title) throws IOException {
+        Stage stgs = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource(fichierFXML));
+        stgs.setTitle(title);
+        stgs.setScene(new Scene(root));
+        stgs.setResizable(false);
+        stgs.show();
+    }
+//affichager de la boite de dialogue 
+
+    public void Boite_dialogue(StackPane stp, String fichierFXML) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource(fichierFXML));
+        JFXDialogLayout dl = new JFXDialogLayout();
+        //dl.setPrefSize(w, h);
+        dl.setBody(root);
+        
+        JFXDialog dialog = new JFXDialog(stp, dl, JFXDialog.DialogTransition.CENTER);
+        dialog.show(stp);
+    }
+    //fermer une fenetre  
+
+    public static void _FermerFxml(AnchorPane pan) {
+        ((Stage) pan.getScene().getWindow()).close();
+    }
+
+//CHARGEMENT TABLE
+    //public static ObservableList<ObservableList> oblist = FXCollections.observableArrayList();
+    public static void tableCharge(String SQL, TableView v) throws ClassNotFoundException, SQLException, Exception {
+        ResultSet res = null;
+        try {
+            ObservableList<ObservableList> oblist = FXCollections.observableArrayList();
+            v.getColumns().clear();
+            v.setColumnResizePolicy(v.CONSTRAINED_RESIZE_POLICY);
+            res = MysSqlConnection.Connect().createStatement().executeQuery(SQL);
+            for (int i = 0; i < res.getMetaData().getColumnCount(); i++) {
+                final int j = i;
+                TableColumn col = new TableColumn(res.getMetaData().getColumnName(i + 1).toUpperCase());
+                col.setPrefWidth((v.getPrefWidth() / res.getMetaData().getColumnCount()));
+                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, Object>, ObservableValue<Object>>() {
+                    @Override
+                    public ObservableValue<Object> call(TableColumn.CellDataFeatures<ObservableList, Object> param) {
+                        return new SimpleObjectProperty(param.getValue().get(j)); //To change body of generated methods, choose Tools | Templates.
+                    }
+                });
+                v.getColumns().addAll(col);
+            }
+            while (res.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                    row.add(res.getString(i));
+                }
+                oblist.add(row);
+            }
+            v.setItems(oblist);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            res.close();
+        }
+    }
+    //recherche dans la table 
+
+    public static void tablerecherche(TableView v, String rch) throws ClassNotFoundException, SQLException, Exception {
+        ResultSet res = null;
+        try {
+            ObservableList<ObservableList> oblist = FXCollections.observableArrayList();
+            v.getColumns().clear();
+            v.setColumnResizePolicy(v.CONSTRAINED_RESIZE_POLICY);
+            res = MysSqlConnection.Connect().createStatement().executeQuery("select * from contribuable where ENTREPRISE like '%" + rch + "%' or NOM_COMPLET like '%" + rch + "%' ");
+            for (int i = 0; i < res.getMetaData().getColumnCount(); i++) {
+                final int j = i;
+                TableColumn col = new TableColumn(res.getMetaData().getColumnName(i + 1).toUpperCase());
+                col.setPrefWidth((v.getPrefWidth() / res.getMetaData().getColumnCount()));
+                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, Object>, ObservableValue<Object>>() {
+                    @Override
+                    public ObservableValue<Object> call(TableColumn.CellDataFeatures<ObservableList, Object> param) {
+                        return new SimpleObjectProperty(param.getValue().get(j)); //To change body of generated methods, choose Tools | Templates.
+                    }
+                });
+                v.getColumns().addAll(col);
+            }
+            while (res.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                    row.add(res.getString(i));
+                }
+                oblist.add(row);
+            }
+            v.setItems(oblist);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            res.close();
+        }
+    }
+//-------------------------------------------------------------
+//recuperation de element dans un tableau
+
+    public ObservableList<String> OnClicTable(TableView table) {
+        ObservableList<String> clic = null;
+        try {
+            clic = (ObservableList<String>) table.getItems().get(table.getSelectionModel().getSelectedIndex());
+        } catch (Exception e) {
+        }
+        return clic;
+    }
+    
+    public String getValue(TableView table, int column) {
+        return OnClicTable(table).get(column);
+    }
+    
+    UtilisateursController c = new UtilisateursController();
+    public JFXRadioButton sx;
+    
+    public void affTableauText(TableView table, Object... ob) {
+        for (int i = 0; i < ob.length; i++) {
+            if (ob[i] instanceof Label) {
+                ((Label) ob[i]).setText(getValue(table, 0 + i));
+            }
+            if (ob[i] instanceof JFXTextField) {
+                ((JFXTextField) ob[i]).setText(getValue(table, 0 + i));
+            }
+            if (ob[i] instanceof JFXPasswordField) {
+                ((JFXPasswordField) ob[i]).setText(getValue(table, 0 + i));
+            }
+            if (ob[i] instanceof JFXRadioButton) {
+                //sx=((JFXRadioButton)ob[i]);
+                String str = getValue(table, 0 + i);
+                if (str.equals("USD")) {
+                    usd1.setSelected(true);
+                } else {
+                    PayementController.cdf1.setSelected(true);
+                }
+                if (str.equals("M")) {
+                    ssexM.setSelected(true);
+                } else {
+                    ssexeF.setSelected(true);
+                }
+                
+            }
+            if (ob[i] instanceof JFXComboBox) {
+                ((JFXComboBox) ob[i]).setValue(getValue(table, 0 + i));
+            }
+        }
+    }
+    
+    public void affTableauText2(TableView table, Object... ob) {
+        for (int i = 0; i < ob.length; i++) {
+            if (ob[i] instanceof JFXTextField) {
+                ((JFXTextField) ob[i]).setText(getValue(table, 0 + i));
+            }
+            if (ob[i] instanceof JFXPasswordField) {
+                ((JFXPasswordField) ob[i]).setText(getValue(table, 0 + i));
+            }
+            if (ob[i] instanceof JFXRadioButton) {
+                //sx=((JFXRadioButton)ob[i]);
+                String str = getValue(table, 0 + i);
+                if (str.equals("M")) {
+                    ModificationClientContribuableController.sssexM.setSelected(true);
+                } else {
+                    ModificationClientContribuableController.sssexeF.setSelected(true);
+                }
+            }
+            if (ob[i] instanceof JFXComboBox) {
+                ((JFXComboBox) ob[i]).setValue(getValue(table, 0 + i));
+            }
+        }
+    }
+
+//---------------------------------------------------------------
+//recuperation de image dans un cercle 
+    public File capture(Circle capture) {
+        File file;
+        FileChooser fileChooser = new FileChooser();
+        ObservableList liste = FXCollections.observableArrayList("*.*");
+        
+        fileChooser.setInitialDirectory(new File("C:\\"));
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image", liste));
+        file = fileChooser.showOpenDialog(null);
+        
+        if (file != null) {
+            PrincipaleController.getFilEntreprise = file;
+            Image img = new Image(file.toURI().toString());
+            capture.setFill(new ImagePattern(img));
+        }
+        return file;
+    }
+//----------------------------------------------------------------------------------------
+//le alerte
+
+    public static void alerteErreur(String titre, String message) {
+        
+        Notifications notificationsErreur = Notifications.create()
+                .title(titre)
+                .text("\n                                 " + message)
+                .graphic(null)
+                .hideAfter(Duration.seconds(5))
+                .position(Pos.BASELINE_RIGHT)
+                .onAction((ActionEvent event) -> {
+                });
+        notificationsErreur.showError();
+        
+    }
+    
+    public static void alerteInformation(String titre, String message) {
+        
+        Notifications notificationBuilder = Notifications.create()
+                .title(titre)
+                .text("\n                               " + message)
+                .graphic(null)
+                .hideAfter(Duration.seconds(5))
+                .position(Pos.BASELINE_RIGHT)
+                .onAction((ActionEvent event) -> {
+                });
+        
+        notificationBuilder.showInformation();
+    }
+    
+    public static void alertCentreDanger(String txt, String message) {
+        Alert dialogW = new Alert(Alert.AlertType.WARNING);
+        dialogW.setTitle(txt);
+        dialogW.setHeaderText(null); // No header
+        dialogW.setContentText(message);
+        dialogW.showAndWait();
+    }
+//-----------------------------------------------------------------------------------------------
+//   transformation de l'image provenant du BD 
+
+    public static Image recupererCapture(InputStream is) throws IOException {
+        BufferedImage bf = ImageIO.read(is);
+        if (bf != null) {
+            return SwingFXUtils.toFXImage(bf, null);
+        }
+        return null;
+    }
+//affichage des elements
+
+    public static void view(String rqt, Object... ob) {
+        try {
+            PreparedStatement ps = (PreparedStatement) MysSqlConnection.Connect().prepareStatement(rqt);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                for (int i = 0; i < ob.length; i++) {
+                    if (ob[i] instanceof JFXTextField) {
+                        JFXTextField txt = (JFXTextField) ob[i];
+                        txt.setText(rs.getString(i + 1));
+                    }
+                    if (ob[i] instanceof Circle) {
+                        Circle circ = (Circle) ob[i];
+                        circ.setFill(new ImagePattern(recupererCapture(rs.getBinaryStream(i + 1))));
+                    }
+                    if (ob[i] instanceof Label) {
+                        Label lb = (Label) ob[i];
+                        lb.setText(rs.getString(i + 1));
+                    }
+                    if (ob[i] instanceof JFXComboBox) {
+                        JFXComboBox cb = (JFXComboBox) ob[i];
+                        cb.getItems().add(rs.getString(i + 1));
+                    }
+                    
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    //-----------------------------------------------------
+    //Auto-Complter
+    public ObservableList autoCompletion(String Table, String Colone) throws ClassNotFoundException, Exception {
+        ObservableList list = FXCollections.observableArrayList();
+        try {
+            PreparedStatement pst = (PreparedStatement) DAO.MysSqlConnection.Connect().prepareStatement("SELECT " + Colone + " FROM " + Table);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                list.addAll(rs.getString(Colone));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
+    }
+    
+    public void chargememtCompletion(JFXTextField textFied, String Table, String Colonne) {
+        textFied.setOnMouseClicked((e) -> {
+            try {
+                TextFields.bindAutoCompletion(textFied, autoCompletion(Table, Colonne));
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ContenuClasse.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+    }
+//piechart
+    static ObservableList<PieChart.Data> xx;
+    static ObservableList<LineChart.Data> xx1;
+    
+    public static void peiechar(Object ob) throws Exception {
+        xx = FXCollections.observableArrayList();
+        String[] mois = new String[12];
+        for (int i = 0; i < mois.length; i++) {
+            PreparedStatement ps = (PreparedStatement) MysSqlConnection.Connect().prepareStatement("SELECT COUNT(dates) FROM t_ip "
+                    + "WHERE MONTH(dates) = " + (i + 1) + " and year(current_date())");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                mois[i] = rs.getString(1);
+            }
+        }
+        PieChart p = null;
+        for (int j = 0; j < mois.length; j++) {
+            String[] mmois = {"Janvier", "Février", "Mars", "Avril", "Mais", "Juin", "Juillet", "Août", "Septembre",
+                "Octobre", "Novembre", "Décembre"};
+            if (ob instanceof PieChart) {
+                p = (PieChart) ob;
+                p.setTitle("EFFECTIF MENSUEL");
+                xx.add(new PieChart.Data(mmois[j] + " (" + mois[j] + ")", Integer.parseInt(mois[j])));
+                
+            }
+        }
+        p.setData(xx);
+    }
+    //barchar
+    static XYChart.Series s = new XYChart.Series<>();
+    static XYChart.Series s1 = new XYChart.Series<>();
+    
+    public static void barchar(Object... ob) throws SQLException, ClassNotFoundException, Exception {
+        
+        PreparedStatement ps = (PreparedStatement) MysSqlConnection.Connect().prepareStatement("select count(ETAT)"
+                + " from v_gestion_ipr where ETAT='ACTIVER'");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            int x = rs.getInt(1);
+            s.getData().add(new XYChart.Data<>("Compte Activer", x));
+        }
+        PreparedStatement pss = (PreparedStatement) MysSqlConnection.Connect().prepareStatement("select count(ETAT) "
+                + "from v_gestion_ipr where ETAT='DESACTIVER'");
+        ResultSet rss = pss.executeQuery();
+        if (rss.next()) {
+            int y = rss.getInt(1);
+            s1.getData().add(new XYChart.Data<>("Compte désactiver", y));
+        }
+        
+        BarChart line = null;
+        
+        for (int x = 0; x < ob.length; x++) {
+            if (ob[x] instanceof BarChart) {
+                line = (BarChart) ob[x];
+                line.setTitle("Effectif Total sur les IPR Activer et Désactiver");
+            }
+        }
+        line.getData().addAll(s, s1);
+    }
+//line char
+
+    static XYChart.Series s11 = new XYChart.Series<>();
+    
+    public static void linechar(Object ob) throws Exception {
+        int[] mois = new int[12];
+        for (int i = 0; i < mois.length; i++) {
+            PreparedStatement ps = (PreparedStatement) MysSqlConnection.Connect().prepareStatement(
+                    "select sum(montan) from payement where month(dateenreg)=" + (i + 1) + " and year(current_date())");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                mois[i] = rs.getInt(1);
+            }
+        }
+        LineChart line = null;
+        for (int j = 0; j < mois.length; j++) {
+            String[] mmois = {"Janvier", "Février", "Mars", "Avril", "Mais", "Juin", "Juillet", "Août", "Septembre",
+                "Octobre", "Novembre", "Décembre"};
+            if (ob instanceof LineChart) {
+                line = (LineChart) ob;
+                line.setTitle("EVOLUTION MENSUEL");
+                //s11.getData().add(new XYChart.Data<>(mmois[j], Integer.parseInt(mois[j])));
+                s11.getData().add(new XYChart.Data<>(mmois[j]+"(" + mois[j] +")", mois[j]));
+                //s11.getData().add(new XYChart.Data<>(mmois[j], 50));
+
+            }
+        }
+        line.getData().addAll(s11);
+    }
+}
