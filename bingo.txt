@@ -1,0 +1,29 @@
+
+
+
+
+api qui n p de liste
+api not relationnel 
+api relationnelle 
+
+dans api il 4 mot
+
+get: puise le donne et rechercher
+put : modifier le donnee
+delet
+
+
+
+PS E:\MyProject\Nouveau dossier\projet1> yarn init
+yarn init v1.22.4
+question name (projet1): Exo1
+question version (1.0.0):
+question description: appretissage graphql
+question entry point (index.js): app.js
+question repository url: Delord
+question author:
+question license (MIT):
+question private:
+success Saved package.json
+Done in 205.80s.
+PS E:\MyProject\Nouveau dossier\projet1> yarn add express

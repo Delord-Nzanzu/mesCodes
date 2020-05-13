@@ -1,0 +1,147 @@
+package Classes;
+
+import Controleurs.ContribuableController;
+import static Controleurs.ContribuableController.tabl;
+import DAO.MysSqlConnection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
+
+/**
+ *
+ * @author Delord
+ */
+public class Paginationnale {
+
+    private int from;
+    private int to;
+    int intpage = 5;
+    public static int count = 0;
+    public static int pageCout = 0;
+    public static String rqte = null;
+    public static TableView tbx = null;
+
+    public List<List> data = new ArrayList<>();
+    public static int t = 0;
+    int c, g;
+
+    public Paginationnale(int from, int to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    public Paginationnale(Pagination pgi, String counts) {
+        try {
+            principaleokbien(pgi, counts);
+        } catch (Exception ex) {
+            Logger.getLogger(Paginationnale.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Paginationnale() {
+    }
+
+    public int getFrom() {
+        return from;
+    }
+
+    public void setFrom(int from) {
+        this.from = from;
+    }
+
+    public int getTo() {
+        return to;
+    }
+
+    public void setTo(int to) {
+        this.to = to;
+    }
+    //pagination
+    public Pagination principaleokbien(Pagination pgi, String counts) {
+        try {
+            ResultSet rs = MysSqlConnection.Connect().createStatement().executeQuery(counts);
+            rs.first();
+            count = rs.getInt(1);
+            rs.close();
+            pageCout = (count / intpage) + 1;
+            pgi.setPageCount(count);
+            pgi.setPageFactory(this::create);
+        } catch (Exception e) {
+            System.out.println("attention  " + e);
+        }
+        return null;
+
+    }
+    //chargement table 
+    public List tableCharge(String SQL, TableView v) throws ClassNotFoundException, SQLException, Exception {
+        ResultSet res = null;
+
+        ObservableList<ObservableList> oblist = FXCollections.observableArrayList();
+        try {
+            v.getColumns().clear();
+            data.clear();
+            v.setColumnResizePolicy(v.CONSTRAINED_RESIZE_POLICY);
+            res = MysSqlConnection.Connect().createStatement().executeQuery(SQL);
+
+            for (int i = 0; i < res.getMetaData().getColumnCount(); i++) {
+                final int j = i;
+                TableColumn col = new TableColumn(res.getMetaData().getColumnName(i + 1).toUpperCase());
+                col.setPrefWidth((v.getPrefWidth() / res.getMetaData().getColumnCount()));
+                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, Object>, ObservableValue<Object>>() {
+                    @Override
+                    public ObservableValue<Object> call(TableColumn.CellDataFeatures<ObservableList, Object> param) {
+                        return new SimpleObjectProperty(param.getValue().get(j)); //To change body of generated methods, choose Tools | Templates.
+                    }
+                });
+                v.getColumns().addAll(col);
+            }
+
+            while (res.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                    row.add(res.getString(i));
+                }
+                oblist.add(row);
+            }
+            v.setItems(oblist);
+            Object ob[] = new Object[oblist.size()];
+            for (int i = 0; i < oblist.size(); i++) {
+                ob[i] = oblist.get(i);
+                data.add(oblist.get(i));
+            }
+//             data=ob;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            res.close();
+        }
+        return data;
+    }
+
+    public Node create(int pageIndex) {
+        try {
+            setFrom(pageIndex * intpage);
+            setTo(intpage);
+            new Paginationnale(pageIndex * intpage, intpage);
+            ContribuableController.tabl.setItems(FXCollections.observableArrayList(tableCharge(rqte + " LIMIT " + getFrom() + "," + getTo(), tbx)));
+            return ContribuableController.tabl;
+        } catch (SQLException ex) {
+            Logger.getLogger(Paginationnale.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Paginationnale.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+}

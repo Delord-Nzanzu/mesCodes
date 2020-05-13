@@ -1,0 +1,76 @@
+pour creer un server API
+
+1. install yarn , install node, 
+
+2. creer un projet
+	dans le projet 
+		yarn init //pour initialiser le projet
+		yarn add nodemon --dev //permettre a rebouste le projet achaque modification, insert, ...
+		yarn add express // qui est le serveur qui prend en charger le methode HTTP ce grace a lui, il est le coeur de la commiaction
+		yarn add sequelize sequelize-cli msql2 (orn (Object Rational Mapping))// il vas nous permettre de creer un ensemble de classe qui vas representer les objet dans le but de pour voir le manipule
+		yarn sequelize init// initialiser le model
+		yarn global add sequelize-auto //permet l'acceptation de generer le BD automatiquement on l'installe une seul fois dans le system
+		npx sequelize-auto -o "./models" -d nomBD -h localhost -u root -p 3306   -e mysql -x Delord// generation de table automatiquement
+		yarn add uuid//charger pour le ID
+		yarn body-parser
+		yarn jsonwebtoken// permet de livre le gettons d'execution d'accees
+
+
+		//ajouter dans tous le table 
+		  timestamps: false,
+      		  defaultScope: {
+       		  attributes: { exclude: ["createdAt", "updatedAt"] },
+     		 },
+
+///test logine table user
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+  TUser.prototype.generateJWT = function generateJWT() {
+    return jwt.sign(
+      {
+        id: this.id,
+      },
+      "secretkey"
+    );
+  };
+  TUser.prototype.toAuthJSON = function toAuthJSON() {
+    return {
+      usename: this.usename,
+      token: this.generateJWT(),
+    };
+  };
+  TUser.prototype.setPassword = function setPassword(password) {
+    this.passwords = bcrypt.hashSync(password, 12);
+  };
+  TUser.prototype.comparePassword = function comparePassword(password) {
+    return bcrypt.compareSync(password, this.passwords);
+  };
+  return TUser;
+
+
+
+
+//cryptage et decryptage
+//dand le dossier middlleware
+const jwt = require("jsonwebtoken");
+
+module.exports = {
+  verifyToken: function (req, res, next) {
+    if (!req.headers.authorization)
+      return res.status(403).json({ error: "unauthorized user" });
+
+    const token = req.headers.authorization.split(" ")[1];
+
+    jwt.verify(token, "secretkey", (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ error: "unauthorized user" });
+      } else {
+        req.user = decoded;
+        next();
+      }
+    });
+  },
+};
