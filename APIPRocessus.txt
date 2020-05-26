@@ -11,9 +11,10 @@ pour creer un server API
 		yarn sequelize init// initialiser le model
 		yarn global add sequelize-auto //permet l'acceptation de generer le BD automatiquement on l'installe une seul fois dans le system
 		npx sequelize-auto -o "./models" -d nomBD -h localhost -u root -p 3306   -e mysql -x Delord// generation de table automatiquement
-		yarn add uuid//charger pour le ID
+		yarn add uuid, shortid//charger pour le ID
 		yarn body-parser
 		yarn jsonwebtoken// permet de livre le gettons d'execution d'accees
+		yarn add express-fileupload// permet de lire le fishe et image
 
 
 		//ajouter dans tous le table 
