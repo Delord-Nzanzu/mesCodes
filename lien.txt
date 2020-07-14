@@ -2,3 +2,9 @@ remote add origin https://github.com/Delord-Nzanzu/mesCodes.git
 
 
 dWZ5c0V3Tjg3dlVOK0FubnZjMXd1dz09
+
+https://www.eti-education.net/pages/doc_cloudinary.php
+
+https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary-and-node-js-2f053b167b80
+
+Le+mon#de009- mot de passe cloudinary

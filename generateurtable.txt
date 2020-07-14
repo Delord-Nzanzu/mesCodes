@@ -1,1 +1,4 @@
 npx sequelize-auto -o "./models" -d nomBD -h localhost -u root -p 3306   -e mysql -x Delord
+
+ flutter pub upgrade
+ flutter upgrade
