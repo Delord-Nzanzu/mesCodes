@@ -1,0 +1,2 @@
+npx creat-react-app nomprojet
+npm install react-bootstrap bootstrap

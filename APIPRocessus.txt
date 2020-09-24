@@ -13,15 +13,33 @@ pour creer un server API
 		npx sequelize-auto -o "./models" -d nomBD -h localhost -u root -p 3306   -e mysql -x Delord// generation de table automatiquement
 		yarn add uuid, shortid//charger pour le ID
 		yarn body-parser
-		yarn jsonwebtoken// permet de livre le gettons d'execution d'accees
+		yarn jsonwebtoke bcryptjs// permet de livre le gettons d'execution d'accees
 		yarn add express-fileupload// permet de lire le fishe et image
-
+		
+		//momgodb
+		yarn add mongoose morgan //mongoose pour etablire la connection dans mongodb, 
 
 		//ajouter dans tous le table 
 		  timestamps: false,
       		  defaultScope: {
        		  attributes: { exclude: ["createdAt", "updatedAt"] },
      		 },
+
+
+mongoose.connect("mongodb://localhost:27017/testdb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on("error", (error) => {
+  console.log(error);
+});
+db.once("open", () => {
+  console.log("database connect succesfull");
+});
+
+
+
 
 ///test logine table user
 
@@ -135,8 +153,15 @@ exports.uploads = (file, folder) => {
   });
 };
 
+//--------------------------git
+//ecrase le fichier puis pull le projet
+git reset --hard
+git pull origin master
 
-
+yarn global remove sequelize-auto
+yarn global add sequelize-auto
+yarn global add sequelize  
+yarn global add mysql2 
 
 
 

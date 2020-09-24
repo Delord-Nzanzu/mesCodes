@@ -7,4 +7,9 @@ https://www.eti-education.net/pages/doc_cloudinary.php
 
 https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary-and-node-js-2f053b167b80
 
-Le+mon#de009- mot de passe cloudinary
+Le+mon#de009-// mot de passe cloudinary
+cloudDelord nom du cluster Mongodb pswd: Le monde009
+
+https://youtu.be/Vs_CBxCfFHk
+
+https://dev.to/jacqueline/using-hapi-joi-version-16-1-7-to-validate-a-request-body-in-a-restful-api-bje
