@@ -12,3 +12,33 @@ https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary
 https://youtu.be/Vs_CBxCfFHk
 
 https://dev.to/jacqueline/using-hapi-joi-version-16-1-7-to-validate-a-request-body-in-a-restful-api-bje
+------
+remote add origin https://github.com/Delord-Nzanzu/mesCodes.git
+
+
+
+
+https://www.eti-education.net/pages/doc_cloudinary.php
+
+https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary-and-node-js-2f053b167b80
+
+
+
+https://youtu.be/Vs_CBxCfFHk
+
+https://dev.to/jacqueline/using-hapi-joi-version-16-1-7-to-validate-a-request-body-in-a-restful-api-bje
+---
+remote add origin https://github.com/Delord-Nzanzu/mesCodes.git
+
+
+
+
+https://www.eti-education.net/pages/doc_cloudinary.php
+
+https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary-and-node-js-2f053b167b80
+
+
+
+https://youtu.be/Vs_CBxCfFHk
+
+https://dev.to/jacqueline/using-hapi-joi-version-16-1-7-to-validate-a-request-body-in-a-restful-api-bje
